@@ -1,9 +1,11 @@
 import React from "react";
 import Navbar from "./components/Navbar";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
 import Footer from "./components/Footer";
 import FetchData from "./components/FetchData";
+import Login from './Sign-up-pages/Login/Login'
+import Signup from './Sign-up-pages/Signup/Signup'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/science" element={<FetchData cat="science" />} />
           <Route path="/technology" element={<FetchData cat="technology" />} />
           <Route path="/sports" element={<FetchData cat="sports" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
         <Footer />
       </Router>
