@@ -33,13 +33,13 @@ function Navbar() {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/business">
-                  Business
+                <Link className="nav-link" to="/apple">
+                  Apple
                 </Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/entertainment">
-                  General
+                  Entertainment
                 </Link>
               </li>
               <li className="nav-item">
@@ -64,7 +64,16 @@ function Navbar() {
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/login">
-                  <button>Login</button>
+                  <button
+                    style={{
+                      borderRadius: "5px",
+                      color: "",
+                      background: "lightblue",
+                      fontFamily: "sans-serif",
+                    }}
+                  >
+                    Login
+                  </button>
                 </Link>
               </li>
             </ul>

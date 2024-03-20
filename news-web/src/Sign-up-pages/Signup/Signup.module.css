@@ -13,13 +13,13 @@
   height: fit-content;
   width: fit-content;
   background-color: #fff;
-  box-shadow: 12px 12px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 5px 10px 20px 5px rgba(71, 71, 71, 0.2);
   padding: 30px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 0px;
-  border: 2px solid;
+  border: none;
 }
 
 .heading {

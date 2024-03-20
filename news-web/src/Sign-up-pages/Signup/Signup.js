@@ -1,14 +1,18 @@
+// Signup.js
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputControl from "../InputControl/InputControl";
+import { collection } from "firebase/firestore";
+import { db } from "../../firebase";
+import { setDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { auth } from "../../firebase";
 import styles from "./Signup.module.css";
 
 function Signup() {
   const navigate = useNavigate();
-
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -16,16 +20,13 @@ function Signup() {
       pass: "",
     },
     validationSchema: Yup.object({
-      name: Yup.string().required("Name is required"),
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
+      name: Yup.string(),
+      email: Yup.string().email("Invalid email address"),
       pass: Yup.string()
-        .required("Password is required")
         .min(6, "Password must be at least 6 characters")
         .matches(
           /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
-          "Must 8 Char,Upper&Lower Case,Num&special Char"
+          "Must 8 Char, Upper & Lower Case, Num & Special Char"
         ),
     }),
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
@@ -38,6 +39,11 @@ function Signup() {
         const user = res.user;
         await updateProfile(user, {
           displayName: values.name,
+        });
+        await setDoc(doc(collection(db, 'users'), user.uid), {
+          Name: values.name,
+          Email: values.email,
+          Password: values.pass,
         });
         navigate("/login");
       } catch (err) {
@@ -68,6 +74,7 @@ function Signup() {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             name="name"
+            required
           />
           {formik.touched.name && formik.errors.name ? (
             <div className={styles.error}>{formik.errors.name}</div>
@@ -80,6 +87,7 @@ function Signup() {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             name="email"
+            required
           />
           {formik.touched.email && formik.errors.email ? (
             <div className={styles.error}>{formik.errors.email}</div>
@@ -93,6 +101,7 @@ function Signup() {
             onBlur={formik.handleBlur}
             name="pass"
             type="password"
+            required
           />
           {formik.touched.pass && formik.errors.pass ? (
             <div className={styles.error}>{formik.errors.pass}</div>
@@ -120,3 +129,4 @@ function Signup() {
 }
 
 export default Signup;
+

@@ -15,7 +15,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="/general" element={<FetchData cat="general" />} />
-          <Route path="/business" element={<FetchData cat="business" />} />
+          <Route path="/apple" element={<FetchData cat="apple" />} />
           <Route
             path="/entertainment"
             element={<FetchData cat="entertainment" />}
@@ -34,3 +34,6 @@ function App() {
 }
 
 export default App;
+
+
+

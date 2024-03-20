@@ -15,8 +15,6 @@ function Login() {
   });
   const [errorMsg, setErrorMsg] = useState("");
   const [submitButtonDisabled, setSubmitButtonDisabled] = useState(false);
-
-  // Automatically fill email and password if available
   useEffect(() => {
     const storedEmail = localStorage.getItem("loginEmail");
     const storedPass = localStorage.getItem("loginPass");
@@ -56,6 +54,7 @@ function Login() {
             setValues((prev) => ({ ...prev, email: event.target.value }))
           }
           placeholder="Enter email address"
+          required
         />
         <InputControl
           label="Password"
@@ -65,6 +64,7 @@ function Login() {
             setValues((prev) => ({ ...prev, pass: event.target.value }))
           }
           placeholder="Enter Password"
+          required
         />
 
         <div className={styles.footer}>
