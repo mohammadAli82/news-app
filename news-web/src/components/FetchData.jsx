@@ -8,13 +8,17 @@ import { addDoc, deleteDoc } from "firebase/firestore";
 import styled from "styled-components";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useAuth } from "../Context/AuthContext";
+import Spinner from "react-bootstrap/Spinner";
+import Popup from "../Pages/Popup";
 
 function FetchData({ cat }) {
   const [article, setArticle] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { currentUser } = useAuth();
   const [likedNews, setLikedNews] = useState([]);
-  const { currentUser } = useAuth(); 
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,71 +45,75 @@ function FetchData({ cat }) {
   useEffect(() => {
     const fetchLikedNews = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "likes"));
+        const q = query(
+          collection(db, "likes"),
+          where("userId", "==", currentUser.uid)
+        );
+        const querySnapshot = await getDocs(q);
         const likedNewsList = querySnapshot.docs.map((doc) => doc.data().title);
         setLikedNews(likedNewsList);
-        localStorage.setItem("likes", JSON.stringify(likedNewsList));
       } catch (error) {
         console.error("Error fetching liked news: ", error);
       }
     };
-    fetchLikedNews();
-  }, []);
+
+    if (currentUser) {
+      fetchLikedNews();
+    }
+  }, [currentUser]);
 
   const handleLike = async (title) => {
     try {
-      const isLiked = likedNews.includes(title);
-      if (isLiked) {
-        const q = query(collection(db, "likes"), where("title", "==", title));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(async (doc) => {
-          await deleteDoc(doc.ref);
-        });
-        const updatedLikedNews = likedNews.filter((news) => news !== title);
-        setLikedNews(updatedLikedNews);
-        localStorage.setItem("likes", JSON.stringify(updatedLikedNews));
-      } else {
+      if (!currentUser) {
+        setPopupMessage("Please first sign up account");
+        setShowPopup(true);
+        return;
+      }
+
+      const q = query(
+        collection(db, "likes"),
+        where("userId", "==", currentUser.uid),
+        where("title", "==", title)
+      );
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
         await addDoc(collection(db, "likes"), {
           title: title,
           likedOn: new Date(),
           userId: currentUser.uid,
         });
-        const updatedLikedNews = [...likedNews, title];
+        setLikedNews([...likedNews, title]);
+      } else {
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
+        const updatedLikedNews = likedNews.filter((news) => news !== title);
         setLikedNews(updatedLikedNews);
-        localStorage.setItem("likes", JSON.stringify(updatedLikedNews));
       }
     } catch (error) {
       console.error("Error toggling like: ", error);
-      alert("Error toggling like. Please try again later");
     }
   };
 
   return (
-    <div className="container my-4">
+    <div
+      className="container
+my-4"
+    >
       <h3 style={{ textAlign: "center" }}>
         <u>TOP HEADLINES</u>
       </h3>
       <div className="row justify-content-center">
         {loading ? (
           <>
-            <p
-              style={{
-                textAlign: "center",
-                fontSize: "25px",
-                marginTop: "25px",
-              }}
-            >
-              Please wait 2 minutes Loading.....
-            </p>
-            <p
-              style={{
-                textAlign: "center",
-                fontSize: "15px",
-                marginTop: "25px",
-              }}
-            >
-              Data Fetch render.com server.....
-            </p>
+            <div style={{ textAlign: "center", marginTop: "25px" }}>
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">
+                  <b>Loading...</b>
+                </span>
+              </Spinner>
+              <p style={{ fontSize: "15px", marginTop: "10px" }}>Loading....</p>
+            </div>
           </>
         ) : error ? (
           <p>Error: {error.message}</p>
@@ -153,6 +161,9 @@ function FetchData({ cat }) {
           <p>No article available</p>
         )}
       </div>
+      {showPopup && (
+        <Popup message={popupMessage} onClose={() => setShowPopup(false)} />
+      )}
     </div>
   );
 }
