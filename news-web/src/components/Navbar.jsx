@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
-import { auth } from "../firebase"; // Import auth from firebase
+import { auth } from "../firebase";
 
 function Navbar() {
   const { currentUser } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await auth.signOut(); // Sign out the current user
+      await auth.signOut();
     } catch (error) {
       console.error("Error logging out: ", error);
     }
